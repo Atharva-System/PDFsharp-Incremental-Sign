@@ -95,27 +95,7 @@ namespace PdfSharp.Tests.IO
         [Fact]
         public void Sign()
         {
-            /**
-             Easy way to create a self-signed certificate for testing.
-             Put the following code in a file called "makecert.ps1" and execute it from PowerShell (tested with 7.4.2).
-             (Adapt the variables to your liking)
-
-             $date = Get-Date
-             # mark valid for 10 years
-             $date = $date.AddYears(10)
-             # define some variables
-             $issuedTo = "FooBar"
-             $subject = "CN=" + $issuedTo
-             $friendlyName = $issuedTo
-             $exportFileName = $issuedTo + ".pfx"
-             # create certificate and add to personal store
-             $cert = New-SelfSignedCertificate -Type Custom -Subject $subject -KeyUsage DigitalSignature,NonRepudiation -KeyUsageProperty Sign -FriendlyName $friendlyName -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter $date
-             # specify password for exported certificate
-             $password = ConvertTo-SecureString -String "1234" -Force -AsPlainText 
-             # export to current folder in pfx format
-             Export-PfxCertificate -Cert $cert -FilePath $exportFileName -Password $password
-             */
-            var cert = new X509Certificate2(@"C:\Data\packdat.pfx", "1234");
+            var cert = new X509Certificate2(@"C:\Data\Test Digital Certificate Password is 123456 (1).pfx", "123456");
             // sign 2 times
             for (var i = 1; i <= 2; i++)
             {
