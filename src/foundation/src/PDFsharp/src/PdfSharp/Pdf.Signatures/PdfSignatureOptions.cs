@@ -1,4 +1,5 @@
 ﻿using PdfSharp.Drawing;
+using PdfSharp.Pdf.Annotations;
 using System.Security.Cryptography.X509Certificates;
 
 namespace PdfSharp.Pdf.Signatures
@@ -69,5 +70,7 @@ namespace PdfSharp.Pdf.Signatures
         /// A custom appearance renderer for the signature
         /// </summary>
         public ISignatureRenderer? Renderer { get; set; }
+
+        public PdfAnnotationFlags FieldFlags { get; init; }
     }
 }

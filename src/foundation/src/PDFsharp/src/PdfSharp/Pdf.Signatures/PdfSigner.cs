@@ -1,4 +1,5 @@
-﻿using PdfSharp.Drawing;
+﻿using Microsoft.Extensions.Options;
+using PdfSharp.Drawing;
 using PdfSharp.Pdf.AcroForms;
 using PdfSharp.Pdf.Annotations;
 using PdfSharp.Pdf.Internal;
@@ -158,12 +159,14 @@ namespace PdfSharp.Pdf.Signatures
 
             signatureField.Value = value;
             signatureField.Elements.SetInteger(PdfAcroField.Keys.Ff, (int)PdfAcroFieldFlags.NoExport);
+            
             signatureField.Elements.SetName(PdfAnnotation.Keys.Type, "/Annot");
             signatureField.Elements.SetName(PdfAnnotation.Keys.Subtype, "/Widget");
             if (isNewField)
             {
                 signatureField.Elements.SetReference("/P", document.Pages[options.PageIndex]);
                 signatureField.Elements.Add(PdfAnnotation.Keys.Rect, new PdfRectangle(options.Rectangle));
+                signatureField.Elements.Add("/F", new PdfInteger((int)options.FieldFlags));
             }
             var annotations = document.Pages[options.PageIndex].Elements.GetArray(PdfPage.Keys.Annots);
             if (annotations == null)
@@ -185,7 +188,7 @@ namespace PdfSharp.Pdf.Signatures
             signatureDict.Filter = "/Adobe.PPKLite";
             signatureDict.SubFilter = "/adbe.pkcs7.detached";
             signatureDict.SigningDate = DateTime.Now;
-
+            
             var documentLength = inputStream.Length;
             // fill with large enough fake values. we will overwrite these later
             var byteRange = new PdfArray(document, new PdfLongInteger(0), new PdfLongInteger(documentLength),
@@ -219,21 +222,26 @@ namespace PdfSharp.Pdf.Signatures
             }
             else
                 annotRect = rect.ToXRect();
+            
 
             var form = new XForm(document, annotRect.Size);
             var gfx = XGraphics.FromForm(form);
             var renderer = options.Renderer ?? new DefaultSignatureRenderer();
             renderer.Render(gfx, annotRect, options);
             form.DrawingFinished();
+
             // form.PdfRenderer might be null here (in GDI build)
             form.PdfRenderer?.Close();
 
             if (signatureField.Elements[PdfAnnotation.Keys.AP] is not PdfDictionary ap)
             {
                 ap = new PdfDictionary(document);
+                
                 signatureField.Elements.Add(PdfAnnotation.Keys.AP, ap);
             }
             ap.Elements.SetReference("/N", form.PdfForm);
+
+            //signatureField.Elements.Add("/F", ap);
         }
 
         /// <summary>
