@@ -3,17 +3,16 @@
 
 using FluentAssertions;
 using PdfSharp.Drawing;
-using PdfSharp.Fonts;
-using PdfSharp.Pdf.IO;
-using PdfSharp.Quality;
-using PdfSharp.Snippets.Font;
-using System.IO;
-using PdfSharp.Pdf.AcroForms;
-using PdfSharp.Pdf.Signatures;
-using Xunit;
-using System.Security.Cryptography.X509Certificates;
-using System.Globalization;
 using PdfSharp.Drawing.Layout;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.AcroForms;
+using PdfSharp.Pdf.IO;
+using PdfSharp.Pdf.Signatures;
+using PdfSharp.Quality;
+using System.Globalization;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
+using Xunit;
 
 namespace PdfSharp.Tests.IO
 {
@@ -94,6 +93,75 @@ namespace PdfSharp.Tests.IO
             // new xref-table was checked manually (opened in notepad)
         }
 
+        PageInfo[] signer1 = new PageInfo[]
+        {
+            new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 2, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 3, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 4, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 5, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 6, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 7, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 8, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 316.554, Y1 = 563.126, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 9, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 10, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 349.351, Y1 = 522.023, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 11, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 12, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 13, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 14, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } }
+        };
+
+        PageInfo[] signer2 = new PageInfo[]
+       {
+            new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 2, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 3, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 4, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 5, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 6, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 7, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 8, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 679.341, Y1 = 307.846, X2 = 99.9938, Y2 = 39.9975 } } },
+            new PageInfo { PageNumber = 9, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 10, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 622.886, Y1 = 372.877, X2 = 99.9938, Y2 = 39.9975 } } },
+            new PageInfo { PageNumber = 11, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 12, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 13, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 14, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } }
+       };
+
+        PageInfo[] signer3 = new PageInfo[]
+       {
+            new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 2, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 3, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 4, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 5, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 6, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 7, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 8, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 0.0, Y1 = 322.301, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 9, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 10, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 72.5693, Y1 = 391.514, X2 = 99.9937, Y2 = 39.9975 } } },
+            new PageInfo { PageNumber = 11, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 12, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 13, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
+            new PageInfo { PageNumber = 14, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 10.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } }
+       };
+
+        private PageInfo[] GetSigner1Pages()
+        {
+            return signer1;
+        }
+
+        private PageInfo[] GetSigner2Pages()
+        {
+            return signer2;
+        }
+
+        private PageInfo[] GetSigner3Pages()
+        {
+            return signer3;
+        }
+
         [Fact]
         public void Sign()
         {
@@ -170,9 +238,108 @@ namespace PdfSharp.Tests.IO
             }
         }
 
+        [Fact]
+        public void Sign1()
+        {
+            // Arrange
+            string sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/BS_Ankit Chokshi  Co._31.03.2024.pdf")!;
+            string outputFile = Path.Combine(Path.GetTempPath(), "AA-Signed.pdf");
+            string certPath = @"C:\Data\Test Digital Certificate Password is 123456 (1).pfx"; // Certificate path
+            string certPassword = "123456"; // Certificate password
+
+            // Set up signer pages
+            List<PageInfo[]> signers = new List<PageInfo[]>() { GetSigner1Pages(), GetSigner2Pages(), GetSigner3Pages() };
+
+            // Act
+            SignPdf(sourceFile, outputFile, certPath, certPassword, signers);
+        }
+
+        public void SignPdf(string sourceFile, string outputFile, string certPath, string certPassword, List<PageInfo[]> signers)
+        {
+            using var document = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Modify);
+            var certificate = new X509Certificate2(certPath, certPassword);
+            int i = 1;
+            foreach (var signerPages in signers)
+            {
+                foreach (var pageInfo in signerPages)
+                {
+                    var page = document.Pages[pageInfo.PageNumber - 1];
+                    // Determine page dimensions
+                    double pageWidth = page.Width;
+                    double pageHeight = page.Height;
+
+                    // Adjust coordinates for landscape pages
+                    double x = pageInfo.PDFCoordinates[0].X1;
+                    double y = pageInfo.PDFCoordinates[0].Y1;
+
+                    // Check if the page is in landscape orientation
+                    bool isLandscape = pageWidth > pageHeight;
+
+                    // Log coordinates for debugging
+                    Console.WriteLine($"Signing page {pageInfo.PageNumber}: X={x}, Y={y}");
+
+                    // Adjust coordinates based on orientation
+                    if (isLandscape)
+                    {
+                        //page.Rotate = 0;
+                        // If the page is landscape, swap X and Y coordinates
+                        double tempX = x;
+                        x = y; // Assuming X corresponds to Y when landscape
+                        y = tempX;
+                    }
+                    int rotation = page.Rotate;
+                    // Create graphics object and draw the signature
+                    using var gfx = XGraphics.FromPdfPage(page);
+
+                    //XRect signRect = new XRect(x, y, 133.33, 33);//XRect(newX, newY, signWidth, signHeight);
+                    //if (rotation == 90 || rotation == 270)
+                    //{
+                    //    // Rotate text at the center of the signature box
+                    //    gfx.RotateAtTransform(270, new XPoint(signRect.X + signRect.Width / 2, signRect.Y + signRect.Height / 2));
+                    //}
+
+                    // Define a larger font size for better visibility
+                    var font = new XFont("Arial", 12);
+                    gfx.DrawString("Signer" + i, font, new XSolidBrush(XColors.Red), x, y);
+
+                    // Optionally, add a rectangle around the signature to make it more visible
+                    gfx.DrawRectangle(new XSolidBrush(XColors.Transparent), x - 5, y - 5, 133.33, 33); // Adjust size as needed
+                }
+                i++;
+            }
+            document.Save(outputFile);
+        }
+        private void DrawSignature(PdfPage page, PdfCoordinate coordinate)
+        {
+            // Create an XGraphics object for drawing
+            using (XGraphics gfx = XGraphics.FromPdfPage(page))
+            {
+                // Load the signature image
+                // You can change the path to your image
+                string signatureImagePath = @"C:\Data\stamp.png";
+                XImage image = XImage.FromFile(signatureImagePath);
+
+                // Draw the image at the specified coordinates
+                gfx.DrawImage(image, coordinate.X1, coordinate.Y1, coordinate.X2, coordinate.Y2);
+            }
+        }
     }
 }
 
+public class PdfCoordinate
+{
+    public double X1 { get; set; }
+    public double Y1 { get; set; }
+    public double X2 { get; set; }
+    public double Y2 { get; set; }
+}
+
+public class PageInfo
+{
+    public int PageNumber { get; set; }
+    public double PageSize { get; set; }
+    public PdfCoordinate[] PDFCoordinates { get; set; }
+}
 
 public class CustomSignatureRenderer : ISignatureRenderer
 {
