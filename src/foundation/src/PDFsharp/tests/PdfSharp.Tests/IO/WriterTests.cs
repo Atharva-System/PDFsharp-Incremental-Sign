@@ -93,7 +93,7 @@ namespace PdfSharp.Tests.IO
             // new xref-table was checked manually (opened in notepad)
         }
 
-        PageInfo[] signer1 = new PageInfo[]
+        PageInfo[] signer2 = new PageInfo[]
         {
             new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
             new PageInfo { PageNumber = 2, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
@@ -111,7 +111,7 @@ namespace PdfSharp.Tests.IO
             new PageInfo { PageNumber = 14, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } }
         };
 
-        PageInfo[] signer2 = new PageInfo[]
+        PageInfo[] signer1 = new PageInfo[]
        {
             new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
             new PageInfo { PageNumber = 2, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 240.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
@@ -242,7 +242,7 @@ namespace PdfSharp.Tests.IO
         public void Sign1()
         {
             // Arrange
-            string sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/BS_Ankit Chokshi  Co._31.03.2024.pdf")!;
+            string sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/180Rotate.pdf")!;
             string outputFile = Path.Combine(Path.GetTempPath(), "AA-Signed.pdf");
             string certPath = @"C:\Data\Test Digital Certificate Password is 123456 (1).pfx"; // Certificate path
             string certPassword = "123456"; // Certificate password
@@ -258,57 +258,96 @@ namespace PdfSharp.Tests.IO
         {
             using var document = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Modify);
             var certificate = new X509Certificate2(certPath, certPassword);
-            int i = 1;
+            int signerIndex = 1;
+
             foreach (var signerPages in signers)
             {
                 foreach (var pageInfo in signerPages)
                 {
                     var page = document.Pages[pageInfo.PageNumber - 1];
-                    // Determine page dimensions
-                    double pageWidth = page.Width;
-                    double pageHeight = page.Height;
 
-                    // Adjust coordinates for landscape pages
-                    double x = pageInfo.PDFCoordinates[0].X1;
-                    double y = pageInfo.PDFCoordinates[0].Y1;
+                    double pageWidth = page.Width.Point;
+                    double pageHeight = page.Height.Point;
 
-                    // Check if the page is in landscape orientation
+                    double originalPageWidth = page.Width.Point;
+                    double originalPageHeight = page.Height.Point;
+
                     bool isLandscape = pageWidth > pageHeight;
 
-                    // Log coordinates for debugging
-                    Console.WriteLine($"Signing page {pageInfo.PageNumber}: X={x}, Y={y}");
+                    int rotation = page.Rotate;
 
-                    // Adjust coordinates based on orientation
                     if (isLandscape)
                     {
-                        //page.Rotate = 0;
-                        // If the page is landscape, swap X and Y coordinates
-                        double tempX = x;
-                        x = y; // Assuming X corresponds to Y when landscape
-                        y = tempX;
+                        var tempHeight = pageHeight;
+                        pageHeight = pageWidth;
+                        pageWidth = tempHeight;
                     }
-                    int rotation = page.Rotate;
-                    // Create graphics object and draw the signature
+                    if (pageInfo.PageNumber ==4)
+                    {
+
+                    }
+                    // Adjust coordinates based on the page's rotation
+                    var coord = pageInfo.PDFCoordinates[0];
+                    double transformedX1, transformedY1, transformedWidth, transformedHeight;
+
+                    switch (rotation)
+                    {
+                        case 90:
+                            // 90-degree rotation (coordinates swap and invert accordingly)
+                            transformedX1 = coord.Y1 > pageWidth ? pageWidth - ((coord.Y2 / 2) + (coord.X2 / 2)) : coord.Y1;
+                            transformedY1 = pageWidth - coord.X1 - coord.X2;
+                            transformedWidth = coord.Y2;
+                            transformedHeight = coord.X2;
+                            break;
+
+                        case 180:
+                            // 180-degree rotation (invert coordinates)
+                            transformedX1 = pageWidth - coord.X1 - coord.X2;
+                            transformedY1 = pageHeight - coord.Y1 - coord.Y2;
+                            transformedWidth = coord.X2;
+                            transformedHeight = coord.Y2;
+                            break;
+
+                        case 270:
+                            // 270-degree rotation (coordinates swap and invert accordingly)
+                            transformedX1 = coord.Y1> originalPageHeight ?  coord.Y2 :  originalPageHeight - coord.Y1 - coord.Y2;
+                            transformedY1 = pageWidth - (originalPageWidth - coord.X1);
+                            transformedWidth = coord.Y2;
+                            transformedHeight = coord.X2;
+                            break;
+
+                        default:
+                            // No rotation (0 degrees)
+                            transformedX1 = coord.X1;
+                            transformedY1 = coord.Y1;
+                            transformedWidth = coord.X2;
+                            transformedHeight = coord.Y2;
+                            break;
+                    }
+
+                    // Create the rectangle for the signature with adjusted coordinates
+                    XRect signRect = new XRect(transformedX1, transformedY1, transformedWidth, transformedHeight);
+
+                    // Create a graphics object to draw the signature
                     using var gfx = XGraphics.FromPdfPage(page);
 
-                    //XRect signRect = new XRect(x, y, 133.33, 33);//XRect(newX, newY, signWidth, signHeight);
-                    //if (rotation == 90 || rotation == 270)
-                    //{
-                    //    // Rotate text at the center of the signature box
-                    //    gfx.RotateAtTransform(270, new XPoint(signRect.X + signRect.Width / 2, signRect.Y + signRect.Height / 2));
-                    //}
+                    // Optionally, define a font for the signature (for debugging)
+                    // var font = new XFont("Arial", 12);
+                    // gfx.DrawString("Signer" + signerIndex, font, new XSolidBrush(XColors.Red), signRect.Location);
 
-                    // Define a larger font size for better visibility
-                    var font = new XFont("Arial", 12);
-                    gfx.DrawString("Signer" + i, font, new XSolidBrush(XColors.Red), x, y);
-
-                    // Optionally, add a rectangle around the signature to make it more visible
-                    gfx.DrawRectangle(new XSolidBrush(XColors.Transparent), x - 5, y - 5, 133.33, 33); // Adjust size as needed
+                    // Draw a rectangle around the signature (optional, for debugging)
+                    gfx.DrawRectangle(new XPen(XColors.Black), signRect);
                 }
-                i++;
+                signerIndex++;
             }
+
+            // Save the modified document
             document.Save(outputFile);
         }
+
+
+
+
         private void DrawSignature(PdfPage page, PdfCoordinate coordinate)
         {
             // Create an XGraphics object for drawing
