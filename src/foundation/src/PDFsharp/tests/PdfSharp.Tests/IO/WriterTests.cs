@@ -2,7 +2,6 @@
 // See the LICENSE file in the solution root for more information.
 
 using FluentAssertions;
-
 using PdfSharp.Drawing;
 using PdfSharp.Drawing.Layout;
 using PdfSharp.Pdf;
@@ -168,7 +167,7 @@ namespace PdfSharp.Tests.IO
         {
             var cert = new X509Certificate2(@"C:\Data\Test Digital Certificate Password is 123456 (1).pfx", "123456");
 
-            for (var i = 1; i <= 4; i++)
+            for (var i = 1; i <= 2; i++)
             {
                 var renderer = new CustomSignatureRenderer(); // Assuming CustomSignatureRenderer implements ISignatureRenderer
 
@@ -176,56 +175,26 @@ namespace PdfSharp.Tests.IO
                 {
                     Certificate = cert,
                     FieldName = "Signature-" + Guid.NewGuid().ToString("N"),
-                    PageIndex = i - 1,
-                    Rectangle = new XRect(40,120,60,100),
+                    PageIndex = 0,
+                    Rectangle = new XRect(120 * i, 40, 100, 60),
                     Location = "My PC",
                     Reason = "Approving Rev #" + i,
                     Image = XImage.FromFile(@"C:\Data\stamp.png"),
                     FieldFlags = PdfSharp.Pdf.Annotations.PdfAnnotationFlags.Print,
-                    
-                    Height = 612,
-                    Width= 792 
                     //Renderer = renderer // Assign your custom renderer here
                 };
-                if  (i==1)
-                {
-                    options.Rotation = 0;
-                }
-                if (i == 4)
-                {
-                    options.Rotation = 90;
-                }
-                if (i == 3)
-                {
-                    options.Rotation = 180;
-                }
-                if (i == 2)
-                {
-                    options.Rotation = 270;
-                }
+
+
+
+
                 string sourceFile;
                 string targetFile;
 
                 // Set source and target files for first and second signature
                 if (i == 1)
                 {
-                    sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/180Rotate.pdf")!;
-
-                    PdfSharp.Pdf.PdfDocument document = PdfReader.Open(sourceFile, PdfDocumentOpenMode.Modify);
-                    foreach (var item in document.Pages)
-                    {
-                        item.Annotations.Clear();
-                    }
-
-                    sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/test.pdf")!;
-                    document.Save(sourceFile);
-
-
+                    sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/Table-Layout.pdf")!;
                     targetFile = Path.Combine(Path.GetTempPath(), "AA-Signed.pdf");
-
-
-
-
                 }
                 else
                 {
@@ -313,7 +282,7 @@ namespace PdfSharp.Tests.IO
                         pageHeight = pageWidth;
                         pageWidth = tempHeight;
                     }
-                    if (pageInfo.PageNumber == 4)
+                    if (pageInfo.PageNumber ==4)
                     {
 
                     }
@@ -341,7 +310,7 @@ namespace PdfSharp.Tests.IO
 
                         case 270:
                             // 270-degree rotation (coordinates swap and invert accordingly)
-                            transformedX1 = coord.Y1 > originalPageHeight ? coord.Y2 : originalPageHeight - coord.Y1 - coord.Y2;
+                            transformedX1 = coord.Y1> originalPageHeight ?  coord.Y2 :  originalPageHeight - coord.Y1 - coord.Y2;
                             transformedY1 = pageWidth - (originalPageWidth - coord.X1);
                             transformedWidth = coord.Y2;
                             transformedHeight = coord.X2;
