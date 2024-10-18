@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace PdfSharp.Pdf.Signatures
 {
     internal class DefaultSignatureRenderer : ISignatureRenderer
@@ -13,9 +14,34 @@ namespace PdfSharp.Pdf.Signatures
         public void Render(XGraphics gfx, XRect rect, PdfSignatureOptions options)
         {
             // if an image was provided, render only that
+            // if an image was provided, render only that
             if (options.Image != null)
             {
-                gfx.DrawImage(options.Image, 0, 0, rect.Width, rect.Height);
+
+                // Save the current state of the graphics context
+                gfx.Save();
+
+                // Set the rotation based on the specified angle
+                switch (options.Rotation)
+                {
+                    case 90:
+                        gfx.RotateTransform(0); // Rotate 90 degrees
+                        gfx.DrawImage(options.Image, 0, 0, rect.Width, rect.Height);
+                        break;
+                    case 180:
+                        gfx.RotateTransform(0);
+                        gfx.DrawImage(options.Image, 0, 0, rect.Height, rect.Width);
+                        break;
+                    case 270:
+                        gfx.RotateTransform(0);
+
+                        gfx.DrawImage(options.Image, 0, 0, rect.Height, rect.Width);
+                        break;
+                    default:
+                        gfx.DrawImage(options.Image, 0, 0, rect.Width, rect.Height);
+                        break;
+                }
+                gfx.Restore();
                 return;
             }
 
@@ -23,7 +49,7 @@ namespace PdfSharp.Pdf.Signatures
             if (options.Signer != null)
             {
                 sb.AppendFormat("Signed by {0}\n", options.Signer);
-            }    
+            }
             if (options.Location != null)
             {
                 sb.AppendFormat("Location: {0}\n", options.Location);
