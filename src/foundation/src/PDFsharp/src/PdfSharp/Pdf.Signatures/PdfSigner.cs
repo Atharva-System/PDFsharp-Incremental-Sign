@@ -226,8 +226,11 @@ namespace PdfSharp.Pdf.Signatures
 
             var form = new XForm(document, annotRect.Size);
             var gfx = XGraphics.FromForm(form);
+
             var renderer = options.Renderer ?? new DefaultSignatureRenderer();
+
             renderer.Render(gfx, annotRect, options);
+            //gfx.RotateAtTransform(90, new XPoint(annotRect.X + annotRect.Width / 2, annotRect.Y + annotRect.Height / 2));
             form.DrawingFinished();
 
             // form.PdfRenderer might be null here (in GDI build)

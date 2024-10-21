@@ -72,5 +72,11 @@ namespace PdfSharp.Pdf.Signatures
         public ISignatureRenderer? Renderer { get; set; }
 
         public PdfAnnotationFlags FieldFlags { get; init; }
+
+        public int Rotation { get; set; } = 0;
+
+        public int Height { get; set; } = 0;
+
+        public int Width { get; set; } = 0;
     }
 }
