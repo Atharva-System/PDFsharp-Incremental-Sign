@@ -15,7 +15,8 @@ namespace PdfSharp.Pdf.Signatures
             // if an image was provided, render only that
             if (options.Image != null)
             {
-                gfx.DrawImage(options.Image, 0, 0, rect.Width, rect.Height);
+                var point = new XPoint(rect.Width / 10, rect.Height / 10);
+                gfx.DrawImage(options.Image, point.X, point.Y, rect.Width, rect.Height);
                 return;
             }
 
@@ -32,7 +33,11 @@ namespace PdfSharp.Pdf.Signatures
             {
                 sb.AppendFormat("Reason: {0}\n", options.Reason);
             }
-            sb.AppendFormat(CultureInfo.CurrentCulture, "Date: {0}", DateTime.Now);
+            if (options.SignDate != null)
+            {
+                sb.AppendFormat("Sign Date: {0}\n", options.SignDate);
+            }
+            //sb.AppendFormat(CultureInfo.CurrentCulture, "Date: {0}", DateTime.Now);
 
             XFont font = new XFont("Verdana", 7, XFontStyleEx.Regular);
 

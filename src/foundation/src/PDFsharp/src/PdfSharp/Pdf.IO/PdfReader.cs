@@ -322,7 +322,7 @@ namespace PdfSharp.Pdf.IO
 
                 // 3. Check password, if required.
                 var effectiveSecurityHandler = _document.EffectiveSecurityHandler;
-                if (effectiveSecurityHandler != null)
+                if (effectiveSecurityHandler != null && !string.IsNullOrWhiteSpace(password))
                 {
                 TryAgain: // ... after the password provider provides a valid password.
                     // ReSharper disable RedundantIfElseBlock to keep code more readable.
@@ -346,7 +346,7 @@ namespace PdfSharp.Pdf.IO
                                 throw new PdfReaderException(PSSR.InvalidPassword);
                         }
                     }
-                    else if (validity == PasswordValidity.UserPassword 
+                    else if (validity == PasswordValidity.UserPassword
                         && (openMode == PdfDocumentOpenMode.Modify || openMode == PdfDocumentOpenMode.Append))
                     {
                         if (passwordProvider != null)
@@ -362,6 +362,10 @@ namespace PdfSharp.Pdf.IO
                             throw new PdfReaderException(PSSR.OwnerPasswordRequired);
                     }
                     // ReSharper restore RedundantIfElseBlock
+                }
+                else if (_document.SecuritySettings.IsEncrypted && string.IsNullOrWhiteSpace(password))
+                {
+                    throw new PdfReaderException(PSSR.PasswordRequired);
                 }
                 else
                 {
@@ -421,8 +425,40 @@ namespace PdfSharp.Pdf.IO
                         PdfSharpLogHost.PdfReadingLogger.LogInformation("Number of deleted unreachable objects: " + removed);
                     }
 
+                    int retryCount = 0;
+                    int maxRetries = 5; // Maximum number of retries
+                    int delay = 500;    // Delay between retries (in milliseconds)
+                    bool success = false;
+
+                    while (retryCount < maxRetries)
+                    {
+                        try
+                        {
+                            // Attempt to access _document.Pages
+                            if (_document != null && _document.Pages != null)
+                            {
+                                success = true;
+                                break; // Exit the loop if successful
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log or handle the exception
+                            Console.WriteLine($"Attempt {retryCount + 1}: Failed to access _document.Pages. Exception: {ex.Message}");
+                        }
+
+                        // Wait for a short period before retrying
+                        Thread.Sleep(delay);
+                        retryCount++;
+                    }
+
+                    if (!success)
+                    {
+                        throw new InvalidOperationException("Unable to access _document.Pages after retrying.");
+                    }
+
                     // Force flattening of page tree.
-                    var pages = _document.Pages;
+                    var pages = _document!.Pages;
                     Debug.Assert(pages != null);
 
                     _document.IrefTable.CheckConsistence();

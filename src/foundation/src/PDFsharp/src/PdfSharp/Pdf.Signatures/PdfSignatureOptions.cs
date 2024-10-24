@@ -1,5 +1,6 @@
 ﻿using PdfSharp.Drawing;
 using PdfSharp.Pdf.Annotations;
+using PdfSharp.Pdf.Security;
 using System.Security.Cryptography.X509Certificates;
 
 namespace PdfSharp.Pdf.Signatures
@@ -72,5 +73,46 @@ namespace PdfSharp.Pdf.Signatures
         public ISignatureRenderer? Renderer { get; set; }
 
         public PdfAnnotationFlags FieldFlags { get; init; }
+        /// <summary>
+        /// Custom SignDate
+        /// </summary>
+        public string? SignDate { get; set; }
+        /// <summary>
+        /// Add PDF Security Settings
+        /// </summary>
+        public string? ApplySecuritySetting { get; set; }
+        /// <summary>
+        /// PermitPrint
+        /// </summary>
+        public string? PermitPrint { get; set; }
+        /// <summary>
+        /// PermitExtractContent
+        /// </summary>
+        public string? PermitExtractContent { get; set; }
+        /// <summary>
+        /// PermitFormsFill
+        /// </summary>
+        public string? PermitFormsFill { get; set; }
+        /// <summary>
+        /// PermitAnnotations
+        /// </summary>
+        public string? PermitAnnotations { get; set; }
+        /// <summary>
+        /// PermitAssembleDocument
+        /// </summary>
+        public string? PermitAssembleDocument { get; set; }
+        /// <summary>
+        /// PermitFullQualityPrint
+        /// </summary>
+        public string? PermitFullQualityPrint { get; set; }
+        /// <summary>
+        /// PermitModifyDocument
+        /// </summary>
+        public string? PermitModifyDocument { get; set; }
+
+        /// <summary>
+        /// Password for Apply Security Settings
+        /// </summary>
+        public string? Password { get; set; }
     }
 }

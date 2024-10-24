@@ -4,6 +4,7 @@ using PdfSharp.Pdf.AcroForms;
 using PdfSharp.Pdf.Annotations;
 using PdfSharp.Pdf.Internal;
 using PdfSharp.Pdf.IO;
+using System;
 using System.Security.Cryptography.X509Certificates;
 
 namespace PdfSharp.Pdf.Signatures
@@ -20,7 +21,6 @@ namespace PdfSharp.Pdf.Signatures
         private readonly ISigner signer;
 
         private readonly PdfSignatureOptions options;
-
         /// <summary>
         /// Create new new instance for the specified document and with the specified options
         /// </summary>
@@ -40,12 +40,10 @@ namespace PdfSharp.Pdf.Signatures
                 throw new ArgumentException("A certificate is required to sign");
             if (options.PageIndex < 0)
                 throw new ArgumentException("Page index cannot be less than zero");
-
             inputStream = documentStream;
             document = PdfReader.Open(documentStream, PdfDocumentOpenMode.Append);
             signer = new DefaultSigner(signatureOptions);
         }
-
         /// <summary>
         /// Signs the document
         /// </summary>
@@ -54,6 +52,24 @@ namespace PdfSharp.Pdf.Signatures
         {
             var signatureValue = CreateSignatureValue();
             var signatureField = GetOrCreateSignatureField(signatureValue);
+
+            if (Convert.ToBoolean(options.ApplySecuritySetting))
+            {
+                document.SecuritySettings.PermitPrint = Convert.ToBoolean(options.PermitPrint);
+                document.SecuritySettings.PermitExtractContent = Convert.ToBoolean(options.PermitExtractContent);
+                document.SecuritySettings.PermitFormsFill = Convert.ToBoolean(options.PermitFormsFill);
+                document.SecuritySettings.PermitAnnotations = Convert.ToBoolean(options.PermitAnnotations);
+                document.SecuritySettings.PermitAssembleDocument = Convert.ToBoolean(options.PermitAssembleDocument);
+                document.SecuritySettings.PermitFullQualityPrint = Convert.ToBoolean(options.PermitFullQualityPrint);
+                document.SecuritySettings.PermitModifyDocument = Convert.ToBoolean(options.PermitModifyDocument);
+
+
+                // Set encryption and owner password
+                var securityHandler = document.SecurityHandler;
+                securityHandler.SetEncryptionToV2With128Bits();
+                securityHandler.OwnerPassword = options.Password!;
+            }
+
             RenderSignatureAppearance(signatureField);
 
             var finalDocumentLength = 0L;
@@ -81,6 +97,7 @@ namespace PdfSharp.Pdf.Signatures
             inputStream.Seek(0, SeekOrigin.Begin);
             inputStream.CopyTo(ms);
             // append incremental update
+           
             document.Save(ms);
 
             finalDocumentLength = ms.Length;
@@ -159,7 +176,7 @@ namespace PdfSharp.Pdf.Signatures
 
             signatureField.Value = value;
             signatureField.Elements.SetInteger(PdfAcroField.Keys.Ff, (int)PdfAcroFieldFlags.NoExport);
-            
+
             signatureField.Elements.SetName(PdfAnnotation.Keys.Type, "/Annot");
             signatureField.Elements.SetName(PdfAnnotation.Keys.Subtype, "/Widget");
             if (isNewField)
@@ -188,7 +205,7 @@ namespace PdfSharp.Pdf.Signatures
             signatureDict.Filter = "/Adobe.PPKLite";
             signatureDict.SubFilter = "/adbe.pkcs7.detached";
             signatureDict.SigningDate = DateTime.Now;
-            
+
             var documentLength = inputStream.Length;
             // fill with large enough fake values. we will overwrite these later
             var byteRange = new PdfArray(document, new PdfLongInteger(0), new PdfLongInteger(documentLength),
@@ -222,7 +239,7 @@ namespace PdfSharp.Pdf.Signatures
             }
             else
                 annotRect = rect.ToXRect();
-            
+
 
             var form = new XForm(document, annotRect.Size);
             var gfx = XGraphics.FromForm(form);
@@ -236,7 +253,7 @@ namespace PdfSharp.Pdf.Signatures
             if (signatureField.Elements[PdfAnnotation.Keys.AP] is not PdfDictionary ap)
             {
                 ap = new PdfDictionary(document);
-                
+
                 signatureField.Elements.Add(PdfAnnotation.Keys.AP, ap);
             }
             ap.Elements.SetReference("/N", form.PdfForm);

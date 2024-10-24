@@ -179,9 +179,18 @@ namespace PdfSharp.Tests.IO
                     Rectangle = new XRect(120 * i, 40, 100, 60),
                     Location = "My PC",
                     Reason = "Approving Rev #" + i,
-                    Image = XImage.FromFile(@"C:\Data\stamp.png"),
+                    Image = XImage.FromFile(@"C:\Data\stamp_output.png"),
                     FieldFlags = PdfSharp.Pdf.Annotations.PdfAnnotationFlags.Print,
                     //Renderer = renderer // Assign your custom renderer here
+                    //PermitPrint = "false",
+                    //PermitExtractContent = "false",
+                    //PermitFormsFill = "false",
+                    //PermitAnnotations = "false",
+                    //PermitAssembleDocument = "false",
+                    //PermitFullQualityPrint = "false",
+                    //PermitModifyDocument = "false",
+                    //Password = "Test",
+                    //ApplySecuritySetting = i == 2 ? "true" : "false"
                 };
 
 
@@ -242,7 +251,7 @@ namespace PdfSharp.Tests.IO
         public void Sign1()
         {
             // Arrange
-            string sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/180Rotate.pdf")!;
+            string sourceFile = IOUtility.GetAssetsPath("archives/grammar-by-example/GBE/ReferencePDFs/WPF 1.31/Commercial Sheet Feb. 2023 - Atharv System.pdf")!;
             string outputFile = Path.Combine(Path.GetTempPath(), "AA-Signed.pdf");
             string certPath = @"C:\Data\Test Digital Certificate Password is 123456 (1).pfx"; // Certificate path
             string certPassword = "123456"; // Certificate password
