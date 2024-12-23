@@ -118,7 +118,7 @@ namespace PdfSharp.Pdf.Signatures
         /// <summary>
         /// Font Size of Sign text
         /// </summary>
-        public int FontSize { get; set; } = 6;
+        public double FontSize { get; set; } = 6;
 
         /// <summary>
         /// An image to render as Verified sign
