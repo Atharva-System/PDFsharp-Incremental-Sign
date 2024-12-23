@@ -20,10 +20,16 @@ namespace PdfSharp.Pdf.Signatures
                 return;
             }
 
+            // if an image was provided, render only that
+            if (options.TickImage != null)
+            {
+                gfx.DrawImage(options.TickImage, 0, 0, rect.Width, rect.Height);
+            }
+
             var sb = new StringBuilder();
             if (options.Signer != null)
             {
-                sb.AppendFormat("Signed by {0}\n", options.Signer);
+                sb.AppendFormat("Signed by: {0}\n", options.Signer);
             }    
             if (options.Location != null)
             {
@@ -39,7 +45,7 @@ namespace PdfSharp.Pdf.Signatures
             }
             //sb.AppendFormat(CultureInfo.CurrentCulture, "Date: {0}", DateTime.Now);
 
-            XFont font = new XFont("Verdana", 7, XFontStyleEx.Regular);
+            XFont font = new XFont("Verdana", options.FontSize, XFontStyleEx.Regular);
 
             XTextFormatter txtFormat = new XTextFormatter(gfx);
 

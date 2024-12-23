@@ -114,5 +114,15 @@ namespace PdfSharp.Pdf.Signatures
         /// Password for Apply Security Settings
         /// </summary>
         public string? Password { get; set; }
+
+        /// <summary>
+        /// Font Size of Sign text
+        /// </summary>
+        public int FontSize { get; set; } = 6;
+
+        /// <summary>
+        /// An image to render as Verified sign
+        /// </summary>
+        public XImage? TickImage { get; set; }
     }
 }

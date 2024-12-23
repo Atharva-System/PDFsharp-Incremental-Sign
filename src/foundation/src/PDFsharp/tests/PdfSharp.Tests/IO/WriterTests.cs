@@ -248,6 +248,106 @@ namespace PdfSharp.Tests.IO
         }
 
         [Fact]
+        public void SignTickImage()
+        {
+            var cert = new X509Certificate2(@"C:\Users\rahulp\Desktop\Signcare\Certificate\SignCare_SelfSign_Cert.p12", "signcare");
+
+            // Self SIgn cord
+            //{
+            //    "pageNumber": 1,
+            //        "pageSize": 841.92,
+            //        "pageWidth": 595.32,
+            //        "pdfCoordinates": [
+            //            {
+            //                 "x1": 10,
+            //                "y1": 771.92,
+            //                "x2": 100,
+            //                "y2": 40
+            //            }
+            //        ]
+            //    }
+
+            double pageHeight = 841.92;
+            double left = 10;
+            var top = pageHeight - 771.92 - 40;
+            double width = 100;
+            double height = 40;
+
+            for (var i = 1; i <= 1; i++)
+            {
+                var renderer = new CustomSignatureRenderer(); // Assuming CustomSignatureRenderer implements ISignatureRenderer
+
+                var options = new PdfSignatureOptions
+                {
+                    Certificate = cert,
+                    FieldName = "Signature-" + Guid.NewGuid().ToString("N"),
+                    PageIndex = 0,
+                    Rectangle = new XRect(left, top, width, height),
+                    Reason = "Digitally Signed by SignCare",
+                    Signer = "RAHULKUMAR BIPINBHAI PATEL",
+                    TickImage = XImage.FromFile(@"C:\Users\rahulp\Desktop\Signcare\Certificate\tick.png"),
+                    Certify = true,
+                    FieldFlags = PdfSharp.Pdf.Annotations.PdfAnnotationFlags.Print,
+                    SignDate = $"{DateTime.Now.ToString("MMM dd, yyyy hh:mm tt")} IST",
+                    //Renderer = renderer // Assign your custom renderer here
+                    //PermitPrint = "false",
+                    //PermitExtractContent = "false",
+                    //PermitFormsFill = "false",
+                    //PermitAnnotations = "false",
+                    //PermitAssembleDocument = "false",
+                    //PermitFullQualityPrint = "false",
+                    //PermitModifyDocument = "false",
+                    //Password = "Test",
+                    //ApplySecuritySetting = i == 2 ? "true" : "false"
+                };
+
+
+
+
+                string sourceFile;
+                string targetFile;
+
+                // Set source and target files for first and second signature
+                sourceFile = Path.Combine("D:\\test\\", "test.pdf");
+                targetFile = Path.Combine("D:\\test\\", "test_signed.pdf");
+
+                // Copy the source file to target
+                File.Copy(sourceFile, targetFile, true);
+
+                // Sign the document
+                using (var fs = File.Open(targetFile, FileMode.Open, FileAccess.ReadWrite))
+                {
+                    var signer = new PdfSigner(fs, options);
+                    var resultStream = signer.Sign();
+                    fs.Seek(0, SeekOrigin.Begin);
+                    resultStream.CopyTo(fs);
+                    //// Re-open the document for appending the signature appearance
+                    //using (var document = PdfReader.Open(resultStream, PdfDocumentOpenMode.Append))
+                    //{
+                    //    var page = document.Pages[0];  // Assuming the signature is on the first page
+                    //    XGraphics gfx = XGraphics.FromPdfPage(page);
+
+                    //    // Load and draw the stamp image
+                    //    XImage stampImage = XImage.FromFile(@"C:\Data\stamp.png");
+                    //    gfx.DrawImage(stampImage, 120 * i, page.Height - 40-60 , 100, 60);  // Match the Rectangle coordinates
+
+                    //    // Save the document after signing
+                    //    document.Save(fs);
+                    //}
+                }
+            }
+
+            // Verify the final document
+            using (var finalDoc = PdfReader.Open(Path.Combine(Path.GetTempPath(), "AA-Signed-2.pdf"), PdfDocumentOpenMode.Modify))
+            {
+                var acroForm = finalDoc.AcroForm;
+                acroForm.Should().NotBeNull();
+                var signatureFields = acroForm!.GetAllFields().OfType<PdfSignatureField>().ToList();
+                signatureFields.Count.Should().Be(2);  // Ensure both signatures are present
+            }
+        }
+
+        [Fact]
         public void Sign1()
         {
             // Arrange
