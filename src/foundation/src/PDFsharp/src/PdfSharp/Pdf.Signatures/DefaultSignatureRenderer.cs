@@ -15,8 +15,7 @@ namespace PdfSharp.Pdf.Signatures
             // if an image was provided, render only that
             if (options.Image != null)
             {
-                var point = new XPoint(rect.Width / 10, rect.Height / 10);
-                gfx.DrawImage(options.Image, point.X, point.Y, rect.Width, rect.Height);
+                gfx.DrawImage(options.Image, 0, 0, rect.Width, rect.Height);
                 return;
             }
 
