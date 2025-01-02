@@ -36,7 +36,15 @@ namespace PdfSharp.Pdf.Signatures
             }
             if (options.Reason != null)
             {
-                sb.AppendFormat("Reason: {0}\n", options.Reason);
+                if (options.IncludeReasonText)
+                {
+                    sb.AppendFormat("Reason: {0}\n", options.Reason);
+                }
+                else
+                {
+                    sb.AppendFormat("\n", options.Reason);
+                }
+                
             }
             if (options.SignDate != null)
             {

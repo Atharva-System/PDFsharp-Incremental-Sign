@@ -39,6 +39,11 @@ namespace PdfSharp.Pdf.Signatures
         public string? Reason { get; set; }
 
         /// <summary>
+        /// This is to include Reason text before reason value
+        /// </summary>
+        public bool IncludeReasonText { get; set; } = false;
+
+        /// <summary>
         /// Create a certification signature. Not yet implemented.<br></br>
         /// See chapter 12.8 (Digital Signatures) in Pdf Reference (DocMDP / FieldMDP)
         /// </summary>

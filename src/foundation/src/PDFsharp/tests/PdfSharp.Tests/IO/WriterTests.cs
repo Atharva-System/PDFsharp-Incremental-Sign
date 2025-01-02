@@ -250,7 +250,7 @@ namespace PdfSharp.Tests.IO
         [Fact]
         public void SignTickImage()
         {
-            var cert = new X509Certificate2(@"C:\Users\rahulp\Desktop\Signcare\Certificate\SignCare_SelfSign_Cert.p12", "signcare");
+            var cert = new X509Certificate2(@"C:\Users\rahulp\Desktop\Signcare\Certificate\SelfSIgn\SignCare_SelfSign_Cert.p12", "signcare");
 
             // Self SIgn cord
             //{
@@ -273,9 +273,29 @@ namespace PdfSharp.Tests.IO
             double width = 100;
             double height = 40;
 
-            for (var i = 1; i <= 1; i++)
+            string sourceFile;
+            string targetFile;
+
+            for (var i = 1; i <= 2; i++)
             {
                 var renderer = new CustomSignatureRenderer(); // Assuming CustomSignatureRenderer implements ISignatureRenderer
+
+                if (i == 1)
+                {
+                    // Set source and target files for first and second signature
+                    sourceFile = Path.Combine("D:\\test\\", "test.pdf");
+                    targetFile = Path.Combine("D:\\test\\", "test_signed.pdf");
+                    // Copy the source file to target
+
+                }
+                else
+                {
+                    left = 150;
+                    sourceFile = Path.Combine("D:\\test\\", "test_signed.pdf");
+                    targetFile = Path.Combine("D:\\test\\", "test_signed_2.pdf");
+                }
+
+                File.Copy(sourceFile, targetFile, true);
 
                 var options = new PdfSignatureOptions
                 {
@@ -303,17 +323,6 @@ namespace PdfSharp.Tests.IO
 
 
 
-
-                string sourceFile;
-                string targetFile;
-
-                // Set source and target files for first and second signature
-                sourceFile = Path.Combine("D:\\test\\", "test.pdf");
-                targetFile = Path.Combine("D:\\test\\", "test_signed.pdf");
-
-                // Copy the source file to target
-                File.Copy(sourceFile, targetFile, true);
-
                 // Sign the document
                 using (var fs = File.Open(targetFile, FileMode.Open, FileAccess.ReadWrite))
                 {
@@ -338,7 +347,7 @@ namespace PdfSharp.Tests.IO
             }
 
             // Verify the final document
-            using (var finalDoc = PdfReader.Open(Path.Combine(Path.GetTempPath(), "AA-Signed-2.pdf"), PdfDocumentOpenMode.Modify))
+            using (var finalDoc = PdfReader.Open(Path.Combine(Path.GetTempPath(), "test_signed_2.pdf"), PdfDocumentOpenMode.Modify))
             {
                 var acroForm = finalDoc.AcroForm;
                 acroForm.Should().NotBeNull();
@@ -346,6 +355,69 @@ namespace PdfSharp.Tests.IO
                 signatureFields.Count.Should().Be(2);  // Ensure both signatures are present
             }
         }
+
+        [Fact]
+        public void SignTickImageMultiple()
+        {
+            var cert = new X509Certificate2(@"C:\Users\rahulp\Desktop\Signcare\Certificate\SelfSIgn\SignCare_SelfSign_Cert.p12", "signcare");
+
+            double pageHeight = 841.92;
+            double left = 10;
+            var top = pageHeight - 771.92 - 40;
+            double width = 100;
+            double height = 40;
+
+            string sourceFile = Path.Combine("D:\\test\\", "test.pdf");
+            string targetFile = Path.Combine("D:\\test\\", "test_signed.pdf");
+
+            File.Copy(sourceFile, targetFile, true);
+
+            var signaturePositions = new List<XRect>
+    {
+        new XRect(10, top, width, height),
+        new XRect(150, top, width, height)  // Second signature position
+    };
+
+            using (var fs = File.Open(targetFile, FileMode.Open, FileAccess.ReadWrite))
+            using (var finalDoc = PdfReader.Open(fs, PdfDocumentOpenMode.Modify))
+            {
+                foreach (var pos in signaturePositions)
+                {
+                    var options = new PdfSignatureOptions
+                    {
+                        Certificate = cert,
+                        FieldName = "Signature-" + Guid.NewGuid().ToString("N"),
+                        PageIndex = 0,
+                        Rectangle = pos,
+                        Reason = "Digitally Signed by SignCare",
+                        Signer = "RAHULKUMAR BIPINBHAI PATEL",
+                        TickImage = XImage.FromFile(@"C:\Users\rahulp\Desktop\Signcare\Certificate\tick.png"),
+                        Certify = true,
+                        FieldFlags = PdfSharp.Pdf.Annotations.PdfAnnotationFlags.Print,
+                        SignDate = $"{DateTime.Now:MMM dd, yyyy hh:mm tt} IST"
+                    };
+
+                    //var signer = new PdfSigner(fs, options);
+                    //signer.Sign();
+
+                    var signer = new PdfSigner(fs, options);
+                    var resultStream = signer.Sign();
+                    fs.Seek(0, SeekOrigin.Begin);
+                    resultStream.CopyTo(fs);
+                }
+                finalDoc.Save(fs);
+            }
+
+            // Verify the final document
+            using (var finalDoc = PdfReader.Open(targetFile, PdfDocumentOpenMode.Modify))
+            {
+                var acroForm = finalDoc.AcroForm;
+                acroForm.Should().NotBeNull();
+                var signatureFields = acroForm!.GetAllFields().OfType<PdfSignatureField>().ToList();
+                signatureFields.Count.Should().Be(2);  // Ensure both signatures are present
+            }
+        }
+
 
         [Fact]
         public void Sign1()
@@ -391,7 +463,7 @@ namespace PdfSharp.Tests.IO
                         pageHeight = pageWidth;
                         pageWidth = tempHeight;
                     }
-                    if (pageInfo.PageNumber ==4)
+                    if (pageInfo.PageNumber == 4)
                     {
 
                     }
@@ -419,7 +491,7 @@ namespace PdfSharp.Tests.IO
 
                         case 270:
                             // 270-degree rotation (coordinates swap and invert accordingly)
-                            transformedX1 = coord.Y1> originalPageHeight ?  coord.Y2 :  originalPageHeight - coord.Y1 - coord.Y2;
+                            transformedX1 = coord.Y1 > originalPageHeight ? coord.Y2 : originalPageHeight - coord.Y1 - coord.Y2;
                             transformedY1 = pageWidth - (originalPageWidth - coord.X1);
                             transformedWidth = coord.Y2;
                             transformedHeight = coord.X2;
