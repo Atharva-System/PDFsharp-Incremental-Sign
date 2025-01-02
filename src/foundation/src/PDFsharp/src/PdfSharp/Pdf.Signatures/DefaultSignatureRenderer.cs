@@ -42,13 +42,13 @@ namespace PdfSharp.Pdf.Signatures
                 }
                 else
                 {
-                    sb.AppendFormat("\n", options.Reason);
+                    sb.AppendFormat($"{options.Reason}\n", string.Empty);
                 }
-                
             }
+
             if (options.SignDate != null)
             {
-                sb.AppendFormat("Sign Date: {0}\n", options.SignDate);
+                sb.AppendFormat("Date: {0}\n", options.SignDate);
             }
             //sb.AppendFormat(CultureInfo.CurrentCulture, "Date: {0}", DateTime.Now);
 
