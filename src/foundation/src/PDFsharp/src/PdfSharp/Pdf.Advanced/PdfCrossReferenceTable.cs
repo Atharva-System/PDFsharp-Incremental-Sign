@@ -99,7 +99,7 @@ namespace PdfSharp.Pdf.Advanced
 #endif
             }
             ObjectTable.Add(iref.ObjectID, iref);
-
+            MaxObjectNumber = Math.Max(MaxObjectNumber, iref.ObjectID.ObjectNumber);
             // new objects must be treated like modified objects for incremental updates
             if (ReadyForModification && _document.IsAppending)
             {
