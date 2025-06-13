@@ -165,7 +165,7 @@ namespace PdfSharp.Tests.IO
         [Fact]
         public void Sign()
         {
-            var cert = new X509Certificate2(@"C:\Data\Test Digital Certificate Password is 123456 (1).pfx", "123456");
+            var cert = new X509Certificate2(@"C:\Data\TestCertificate.pfx", "123456");
 
             for (var i = 1; i <= 2; i++)
             {
@@ -176,12 +176,14 @@ namespace PdfSharp.Tests.IO
                     Certificate = cert,
                     FieldName = "Signature-" + Guid.NewGuid().ToString("N"),
                     PageIndex = 0,
-                    Rectangle = new XRect(120 * i, 40, 100, 60),
+                    Rectangle = new XRect(120 * i, 80, 100, 60),
                     Location = "My PC",
                     Reason = "Approving Rev #" + i,
-                    Image = XImage.FromFile(@"C:\Data\stamp_output.png"),
+                    Image = XImage.FromFile(@"C:\Data\stamp.png"),
                     FieldFlags = PdfSharp.Pdf.Annotations.PdfAnnotationFlags.Print,
+                    FontSize = 5,
                     //Renderer = renderer // Assign your custom renderer here
+                    SignDate = $"{DateTime.UtcNow:MM/dd/yyyy HH:mm} UTC"
                     //PermitPrint = "false",
                     //PermitExtractContent = "false",
                     //PermitFormsFill = "false",
