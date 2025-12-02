@@ -93,6 +93,41 @@ namespace PdfSharp.Tests.IO
             // new xref-table was checked manually (opened in notepad)
         }
 
+        [Fact]
+        public void TestThisHere()
+        {
+            string imagePath = @"D:\StaticFiles\first-stamp-image.png";
+            string pdfPath = @"D:\StaticFiles\second-document.pdf";
+            string outputPath = @"D:\StaticFiles\final-file.pdf";
+
+            // Create a new PDF document
+            PdfDocument outputDoc = new PdfDocument();
+
+            // --- 1) Add image page first ---
+            XImage img = XImage.FromFile(imagePath);
+            PdfPage imgPage = outputDoc.AddPage();
+            imgPage.Width = img.PixelWidth * 72 / img.HorizontalResolution;
+            imgPage.Height = img.PixelHeight * 72 / img.VerticalResolution;
+
+            using (XGraphics gfx = XGraphics.FromPdfPage(imgPage))
+            {
+                gfx.DrawImage(img, 0, 0, imgPage.Width, imgPage.Height);
+            }
+
+            // --- 2) Import original PDF pages ---
+            PdfDocument inputDoc = PdfReader.Open(pdfPath, PdfDocumentOpenMode.Import);
+            for (int i = 0; i < inputDoc.PageCount; i++)
+            {
+                outputDoc.AddPage(inputDoc.Pages[i]);
+            }
+
+            // --- Save ---
+            outputDoc.SaveStamp(outputPath);
+
+            outputDoc.Close();
+            inputDoc.CloseWithStamp();
+        }
+
         PageInfo[] signer2 = new PageInfo[]
         {
             new PageInfo { PageNumber = 1, PageSize = 792.0, PDFCoordinates = new PdfCoordinate[] { new PdfCoordinate { X1 = 125.0, Y1 = 722.0, X2 = 100.0, Y2 = 40.0 } } },
