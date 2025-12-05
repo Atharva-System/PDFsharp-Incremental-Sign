@@ -1178,7 +1178,7 @@ namespace PdfSharp.Pdf
                     else if (value is PdfArray ary)
                         ary.ContainingReference = _ownerDictionary.Reference ?? _ownerDictionary.ContainingReference;
                     // minor optimzation
-                    if (_ownerDictionary.Owner != null && _ownerDictionary.Owner.IsAppending && _ownerDictionary.Owner.IrefTable.ReadyForModification)
+                    if (_ownerDictionary.Owner.IsAppending && _ownerDictionary.Owner.IrefTable.ReadyForModification)
                     {
                         var prevItem = _elements.ContainsKey(key) ? this[key] : null;
                         _elements[key] = value;
@@ -1217,7 +1217,7 @@ namespace PdfSharp.Pdf
                     else if (value is PdfArray varray)
                         varray.ContainingReference = _ownerDictionary.Reference ?? _ownerDictionary.ContainingReference;
                     // minor optimzation
-                    if (_ownerDictionary.Owner != null && _ownerDictionary.Owner.IsAppending && _ownerDictionary.Owner.IrefTable.ReadyForModification)
+                    if (_ownerDictionary.Owner.IsAppending && _ownerDictionary.Owner.IrefTable.ReadyForModification)
                     {
                         var prevItem = _elements.ContainsKey(key.Value) ? this[key.Value] : null;
                         // incremental updates: do not mark as modified if we don't have to

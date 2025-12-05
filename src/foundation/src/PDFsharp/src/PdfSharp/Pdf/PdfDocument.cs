@@ -218,27 +218,6 @@ namespace PdfSharp.Pdf
             }
         }
 
-        public void CloseWithStamp()
-        {
-            if (OutStream != null)
-            {
-                EnsureNotYetSaved();
-
-                // Get security handler if document gets encrypted.
-                var effectiveSecurityHandler = SecuritySettings.EffectiveSecurityHandler;
-
-                var writer = new PdfWriter(OutStream, effectiveSecurityHandler);
-                try
-                {
-                    DoSave(writer);
-                }
-                finally
-                {
-                    writer.Close();
-                }
-            }
-        }
-
         /// <summary>
         /// Saves the document to the specified path. If a file already exists, it will be overwritten.
         /// </summary>
@@ -248,14 +227,6 @@ namespace PdfSharp.Pdf
 
             if (!CanModify)
                 throw new InvalidOperationException(PSSR.CannotModify);
-
-            using Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
-            Save(stream);
-        }
-
-        public void SaveStamp(string path)
-        {
-            EnsureNotYetSaved();
 
             using Stream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None);
             Save(stream);
